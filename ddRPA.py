@@ -12,13 +12,11 @@ from scipy import stats
 from sklearn.mixture import GaussianMixture as GMM
 import glob
 import pandas as pd
-import sqlite3
 import os
 import warnings
 from sqlalchemy import create_engine
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
-import statsmodels.api as sm
 import scipy.special as ss
 
 def f_norm(x, w, mu,sigma):
@@ -137,8 +135,8 @@ class image_analysis:
         self.features = w_0, w_1, mu_0, mu_1, sigma_0, sigma_1
 
         x = np.linspace(0, 1, 1000, endpoint=False)
-        #         t_index = np.argwhere(np.diff(np.sign(f_erf0(x, w_0, mu_0, sigma_0) - f_erf1(x, w_1, mu_1, sigma_1)))).flatten()
-        #         self.threshold = x[t_index][0]
+        # t_index = np.argwhere(np.diff(np.sign(f_erf0(x, w_0, mu_0, sigma_0) - f_erf1(x, w_1, mu_1, sigma_1)))).flatten()
+        # self.threshold = x[t_index][0]
         self.portion_positive = w_1  # Positive portion
         self.num_positive = int(self.num_total * self.portion_positive)
         self.num_negative = self.num_total - self.num_positive
@@ -147,13 +145,15 @@ class image_analysis:
             x_list = x.reshape(-1, 1)
             y_list = np.exp(model.score_samples(x_list))
             plt.figure()
-            #             plt.hist(norm, 200, density=True, histtype='stepfilled')
+            # plt.hist(norm, 200, density=True, histtype='stepfilled')
             plt.plot(x, f_norm(x, w_0, mu_0, sigma_0), color='darkred')
             plt.plot(x, f_norm(x, w_1, mu_1, sigma_1), color='forestgreen')
             plt.plot(x_list, y_list, '-r')
-            #             plt.axvline(x=t, color='black', label="Threshold", linestyle='--')
-            #             plt.xlim([0, 0.2])
+            # plt.axvline(x=t, color='black', label="Threshold", linestyle='--')
+            # plt.xlim([0, 0.2])
             plt.show()
+            plt.close()
+
 
     def calculate_concentration(self, reliability=0.95, magnification="10X", show=True):
         self.concent_list = []
@@ -180,7 +180,7 @@ class image_analysis:
                                                 "conc_upper", "conc_exact"])
 
         if show == True:
-            print('Average Radius of droplet:               {0:.2f}'.format(actual_radius))
+            print('\nAverage Radius of droplet:               {0:.2f}'.format(actual_radius))
             print('Number of Poitive calls:                 {0:.2f}'.format(self.num_positive))
             print('Number of Negative calls:                {0:.2f}'.format(self.num_negative))
             print('Propability of positive partition:       {0:.2f} \n'.format(self.portion_positive))
@@ -214,5 +214,5 @@ for i, img_path in enumerate(glob.glob("[!marked_]*.jpg")):
     RPA.measure_droplet()
 
 RPA.thresholding(show_graph=True)
-RPA.calculate_concentration(reliability=0.95, magnification="X10")
+RPA.calculate_concentration(reliability=0.95, magnification="X10", show=True)
 RPA.save_droplet_data(csv=True, sql=True)
