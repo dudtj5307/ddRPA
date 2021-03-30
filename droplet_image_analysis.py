@@ -149,6 +149,7 @@ class Image_analysis:
             plt.axvline(x=self.threshold, color='black', label="Threshold", linestyle='--')
             plt.xlim([0, 0.3])
             plt.show()
+            plt.close()
 
     def calculate_concentration(self, reliability=0.95, magnification="10X", show=True):
         self.concent_list = []
@@ -171,8 +172,7 @@ class Image_analysis:
         self.concent_list = [[self.threshold, self.num_positive, self.num_negative, self.portion_positive,
                               self.concentration_lower, self.concentration_upper, self.concentration_exact]]
         self.df_concent = pd.DataFrame(self.concent_list,
-                                       columns=["threshold", "positive", "negative", "portion", "conc_lower",
-                                                "conc_upper", "conc_exact"])
+                                       columns=["threshold", "positive", "negative", "portion", "conc_lower", "conc_upper", "conc_exact"])
 
         if show == True:
             print('Average Radius of droplet:               {0:.2f}'.format(actual_radius))
@@ -210,4 +210,3 @@ for i, img_path in enumerate(glob.glob("[!marked_]*.jpg")):
 RPA.thresholding(show_graph=True)
 RPA.calculate_concentration(reliability=0.95, magnification="X10")
 RPA.save_droplet_data(csv=True, sql=True)
-
